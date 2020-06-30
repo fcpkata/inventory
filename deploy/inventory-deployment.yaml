@@ -1,0 +1,23 @@
+apiVersion: api/v1/inventory
+kind: Deployment
+metadata:
+  name: inventory-service-deployment
+  namespace: shop
+  labels:
+    app: inventory
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: inventory
+  template:
+    metadata:
+      labels:
+        app: inventory
+    spec:
+      containers:
+      - name: inventory
+        image: SBASHEET/inventory:v1.0
+        ports:
+        - containerPort: 8080
+
