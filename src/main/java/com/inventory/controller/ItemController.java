@@ -12,14 +12,11 @@ import com.inventory.model.Item;
 
 @RestController
 @RequestMapping("/v1")
-public class InventoryController {
+public class ItemController {
 
 	@GetMapping(path = "/item/{itemId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Item> getItem(@PathVariable("itemId") int itemId) {
-		Item item = new Item();
-		item.setItemId(itemId);
-		item.setLocationId(2005000);
-		item.setAvailable(50);
+		Item item = Item.builder().itemId(itemId).locationId(2005000).available(50).build();
 		return new ResponseEntity<Item>(item, HttpStatus.OK);
 		
 	}

@@ -7,12 +7,12 @@ import org.springframework.http.ResponseEntity;
 
 import com.inventory.model.Item;
 
-public class InventoryControllerTest {
+public class ItemControllerTest {
 
 	@Test
 	public void shouldReturnTest() {
 		int itemId = 1002000;
-		InventoryController controller = new InventoryController();
+		ItemController controller = new ItemController();
 		ResponseEntity<Item> itemResponseEntity = controller.getItem(itemId);
 		Item item = itemResponseEntity.getBody();
 		assertEquals(item.getItemId(), itemId);
