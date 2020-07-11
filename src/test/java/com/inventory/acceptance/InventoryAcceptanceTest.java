@@ -17,16 +17,19 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class InventoryAcceptanceTest {
-	
+
 	@Autowired
 	private MockMvc mockMvc;
-	
+
 	@Test
-	public void shouldReturnIventoryDetails() throws Exception {
-		int itemId = 1002000;
-		mockMvc.perform(get("/v1/item/" + itemId))
-		.andDo(print()).andExpect(status().isOk())
-		.andExpect(jsonPath("$.itemId").value(itemId));
+	public void shouldReturnIventoryDetailsForValidBookId() throws Exception {
+
+		mockMvc.perform(get("/v1/item/507f191e810c19729de860ea")).andDo(print()).andExpect(status().isOk())
+				.andExpect(jsonPath("$.itemId").value("507f191e810c19729de860ea"))
+				.andExpect(jsonPath("$.itemName").value("Vaju"))
+				.andExpect(jsonPath("$.price").value(100))
+				.andExpect(jsonPath("$.shippingPrice").value(50));
+
 	}
 
 }
