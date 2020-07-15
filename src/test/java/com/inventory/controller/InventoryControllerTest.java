@@ -72,5 +72,10 @@ public class InventoryControllerTest {
 		items.add(itemTwo);
 		return items;
 	}
+	
+	@Test
+	public void shouldReturnMultipleItems1() {
+	}
+	}
 
-}
+
