@@ -22,7 +22,7 @@ import com.inventory.model.ProductResponse;
 @RunWith(MockitoJUnitRunner.class)
 public class CatalogServiceTest {
 	
-	private static final String url = "http://catalog/catalog/v1/product/";
+	private static final String url = "http://catalog-jx-production.35.224.175.156.nip.io/catalog/v1/product/";
 
 	@Mock
 	private RestTemplate mockRestTemplate;

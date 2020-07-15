@@ -21,7 +21,7 @@ public class CatalogService {
 		this.restTemplate = restTemplate;
 	}
 
-	String uri = "http://catalog/catalog/v1/product/";
+	String uri = "http://catalog-jx-production.35.224.175.156.nip.io/catalog/v1/product/";
 	public ProductResponse checkProductIsPresent(Item item) {
 		ProductResponse addItemResponse = new ProductResponse();
 		List<ValidationError> validationError = new ArrayList<>();
