@@ -19,14 +19,14 @@ public class ItemRepository implements Repository {
 
 	private void init() {
 		this.items = new ArrayList<>();
-		items.add(Item.builder().itemId("507f191e810c19729de860ea").itemName("Vaju").price(100).shippingPrice(50)
+		items.add(Item.builder().productId("507f191e810c19729de860ea").productName("Vaju").price(100).shippingPrice(50)
 				.build());
 	}
 
 	@Override
 	public Item fetchItemById(String itemId) {
-		return items.stream().filter(item -> item.getItemId().equals(itemId)).findFirst()
+		return items.stream().filter(item -> item.getProductId().equals(itemId)).findFirst()
 				.orElseThrow(ItemNotFoundException::new);
-	}
+	}	
 
 }
