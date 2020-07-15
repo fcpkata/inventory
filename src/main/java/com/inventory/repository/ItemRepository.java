@@ -9,11 +9,12 @@ import org.springframework.stereotype.Component;
 
 import com.inventory.exception.ItemNotFoundException;
 import com.inventory.model.Item;
+import com.inventory.model.ProductInformation;
 
 @Component
 public class ItemRepository implements Repository {
 
-	private List<Item> items;
+	private List<ProductInformation> items;
 
 	public ItemRepository() {
 		init();
@@ -21,17 +22,23 @@ public class ItemRepository implements Repository {
 
 	private void init() {
 		this.items = new ArrayList<>();
-		items.add(Item.builder().itemId("507f191e810c19729de860ea").itemName("Vaju").price(100).shippingPrice(50)
-				.sellerId("ABC1").sellerName("ABC").build());
-		items.add(Item.builder().itemId("507f191e810c19729de860eb").itemName("John").price(900).shippingPrice(50)
-				.sellerId("ABC1").sellerName("ABC").build());
-		items.add(Item.builder().itemId("507f191e810c19729de860eb").itemName("John").price(850).shippingPrice(50)
-				.sellerId("XYZ1").sellerName("XYZ").build());
+		items.add(ProductInformation.builder().sellerId("ABC1")
+				.item(Item.builder().productId("507f191e810c19729de860ea").price(100).quantity("2").shippingPrice(50).build())
+				.build());
+		items.add(ProductInformation.builder().sellerId("ABC1")
+				.item(Item.builder().productId("507f191e810c19729de860eb").price(900).quantity("2").shippingPrice(50).build())
+				.build());
+		items.add(ProductInformation.builder().sellerId("XYZ")
+				.item(Item.builder().productId("507f191e810c19729de860eb").price(850).quantity("2").shippingPrice(50).build())
+				.build());
 	}
 
 	@Override
-	public List<Item> fetchItemById(String itemId) {
-		return Optional.of(items.stream().filter(item -> item.getItemId().equals(itemId)).collect(Collectors.toList())).orElseThrow(ItemNotFoundException::new);
+	public List<ProductInformation> fetchItemById(String itemId) {
+		return Optional.of(items.stream()
+				.filter(item -> item.getItem().getProductId().equals(itemId))
+				.collect(Collectors.toList()))
+				.orElseThrow(ItemNotFoundException::new);
 	}
 
 }

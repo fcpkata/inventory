@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.inventory.model.Item;
+import com.inventory.model.ProductInformation;
 import com.inventory.repository.ItemRepository;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -28,11 +29,12 @@ public class InventoryControllerTest {
 
 	@Test
 	public void shouldReturnSingleItem() {
-		List<Item> items = new ArrayList<Item>();
+		
+		List<ProductInformation> items = new ArrayList<ProductInformation>();
 		items.add(getSingleItem());
+		
 		Mockito.when(itemRepository.fetchItemById("507f191e810c19729de860ea")).thenReturn(items);
-
-		ResponseEntity<List<Item>> response = inventoryController.getItems("507f191e810c19729de860ea");
+		ResponseEntity<List<ProductInformation>> response = inventoryController.getItems("507f191e810c19729de860ea");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(response.getBody()).isEqualTo(items);
@@ -40,29 +42,32 @@ public class InventoryControllerTest {
 
 	@Test
 	public void shouldReturnMultipleItems() {
-		List<Item> items = new ArrayList<Item>();
+		List<ProductInformation> items = new ArrayList<ProductInformation>();
 		items.add(getSingleItem());
 		items.addAll(getMultipleItems());
 		Mockito.when(itemRepository.fetchItemById("507f191e810c19729de860eb")).thenReturn(items);
 
-		ResponseEntity<List<Item>> response = inventoryController.getItems("507f191e810c19729de860eb");
+		ResponseEntity<List<ProductInformation>> response = inventoryController.getItems("507f191e810c19729de860eb");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(response.getBody()).isEqualTo(items);
 	}
 
-	private Item getSingleItem() {
-		Item item = Item.builder().itemId("507f191e810c19729de860ea").itemName("Vaju").price(100).shippingPrice(50)
+	private ProductInformation getSingleItem() {
+		ProductInformation item =ProductInformation.builder().sellerId("ABC1")
+				.item(Item.builder().productId("507f191e810c19729de860ea").price(100).quantity("2").shippingPrice(50).build())
 				.build();
 		return item;
 	}
 
-	private List<Item> getMultipleItems() {
-		Item itemOne = Item.builder().itemId("507f191e810c19729de860eb").itemName("John").price(900).shippingPrice(50)
-				.sellerId("ABC1").sellerName("ABC").build();
-		Item itemTwo = Item.builder().itemId("507f191e810c19729de860eb").itemName("John").price(850).shippingPrice(50)
-				.sellerId("XYZ1").sellerName("XYZ").build();
-		List<Item> items = new ArrayList<Item>();
+	private List<ProductInformation> getMultipleItems() {
+		ProductInformation itemOne = ProductInformation.builder().sellerId("ABC1")
+				.item(Item.builder().productId("507f191e810c19729de860eb").price(900).quantity("2").shippingPrice(50).build())
+				.build();
+		ProductInformation itemTwo = ProductInformation.builder().sellerId("XYZ")
+				.item(Item.builder().productId("507f191e810c19729de860eb").price(850).quantity("2").shippingPrice(50).build())
+				.build();
+		List<ProductInformation> items = new ArrayList<ProductInformation>();
 		items.add(itemOne);
 		items.add(itemTwo);
 		return items;

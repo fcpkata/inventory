@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.inventory.model.Item;
+import com.inventory.model.ProductInformation;
 import com.inventory.repository.ItemRepository;
 
 @RestController
@@ -26,9 +26,9 @@ public class InventoryController {
 	}
 
 	@GetMapping("/item/{itemId}")
-	public ResponseEntity<List<Item>> getItems(@PathVariable(value = "itemId") String itemId) {
-		List<Item> book = itemRepository.fetchItemById(itemId);
-		ResponseEntity<List<Item>> response = new ResponseEntity<List<Item>>(book, HttpStatus.OK);
+	public ResponseEntity<List<ProductInformation>> getItems(@PathVariable(value = "itemId") String itemId) {
+		List<ProductInformation> book = itemRepository.fetchItemById(itemId);
+		ResponseEntity<List<ProductInformation>> response = new ResponseEntity<List<ProductInformation>>(book, HttpStatus.OK);
 		return response;
 	}
 

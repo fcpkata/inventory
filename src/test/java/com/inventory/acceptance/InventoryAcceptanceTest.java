@@ -22,14 +22,31 @@ public class InventoryAcceptanceTest {
 	private MockMvc mockMvc;
 
 	@Test
-	public void shouldReturnIventoryDetailsForValidBookId() throws Exception {
+	public void shouldReturnProductInformationForItemValidProductId() throws Exception {
 
 		mockMvc.perform(get("/v1/item/507f191e810c19729de860ea")).andDo(print()).andExpect(status().isOk())
-				.andExpect(jsonPath("$.itemId").value("507f191e810c19729de860ea"))
-				.andExpect(jsonPath("$.itemName").value("Vaju"))
-				.andExpect(jsonPath("$.price").value(100))
-				.andExpect(jsonPath("$.shippingPrice").value(50));
+		        .andExpect(jsonPath("$[0].sellerId").value("ABC1"))
+				.andExpect(jsonPath("$[0].item.productId").value("507f191e810c19729de860ea"))
+				.andExpect(jsonPath("$[0].item.price").value(100))
+				.andExpect(jsonPath("$[0].item.quantity").value("2"))
+				.andExpect(jsonPath("$[0].item.shippingPrice").value(50));
 
+	}
+	
+	@Test
+	public void shouldReturnProductInformationForItemWithMultipleSellers() throws Exception {
+		
+		mockMvc.perform(get("/v1/item/507f191e810c19729de860eb")).andDo(print()).andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].sellerId").value("ABC1"))
+				.andExpect(jsonPath("$[0].item.productId").value("507f191e810c19729de860eb"))
+				.andExpect(jsonPath("$[0].item.price").value(900))
+				.andExpect(jsonPath("$[0].item.quantity").value("2"))
+				.andExpect(jsonPath("$[0].item.shippingPrice").value(50))
+				.andExpect(jsonPath("$[1].sellerId").value("XYZ"))
+				.andExpect(jsonPath("$[1].item.productId").value("507f191e810c19729de860eb"))
+				.andExpect(jsonPath("$[1].item.price").value(850))
+				.andExpect(jsonPath("$[1].item.quantity").value("2"))
+				.andExpect(jsonPath("$[1].item.shippingPrice").value(50));
 	}
 
 }
