@@ -77,7 +77,6 @@ public class InventoryControllerTest {
 	public void shouldReturnMultipleItems1() {
 		//EmptyTest case
 		//added line
-		//added line2
 	}
 	}
 
