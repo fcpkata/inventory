@@ -53,7 +53,7 @@ public class CatalogServiceTest {
 		when(mockRestTemplate.getForEntity(eq(url+"PD001"), eq(Product.class))).thenReturn(mockResponse);
 		ProductResponse response = service.checkProductIsPresent(item);
 		assertThat(response.getValidationError().get(0).getMessage()).isEqualTo("invalid product id");
-		assertThat(response.getValidationError().get(0).getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat(response.getValidationError().get(0).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 	}
 
 }
