@@ -18,7 +18,7 @@ public class Item {
 	@NotNull(message = "Required 'id' is not present")
 	private String productId;
 	private double price;
-	private String quantity;
+	private int quantity;
 	private int shippingPrice;
 
 }
