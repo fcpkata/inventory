@@ -58,7 +58,7 @@ resources:
   requests:
     cpu: 400m
     memory: 512Mi
-probePath: /v1/item/123
+probePath: /v1/item/507f191e810c19729de860ea
 livenessProbe:
   initialDelaySeconds: 60
   periodSeconds: 10
