@@ -49,7 +49,7 @@ public class CatalogServiceTest {
 	
 	@Test
 	public void shouldReturnException_withInvalidProductId() {
-		ResponseEntity<Product> mockResponse = new ResponseEntity<Product>(new Product(), HttpStatus.BAD_REQUEST);
+		ResponseEntity<Product> mockResponse = new ResponseEntity<Product>(new Product(), HttpStatus.NOT_FOUND);
 		when(mockRestTemplate.getForEntity(eq(url+"PD001"), eq(Product.class))).thenReturn(mockResponse);
 		ProductResponse response = service.checkProductIsPresent(item);
 		assertThat(response.getValidationError().get(0).getMessage()).isEqualTo("invalid product id");
