@@ -68,8 +68,8 @@ public class InventoryAcceptanceTest {
 	public void shouldReturnIventoryDetailsForValidBookId() throws Exception {
 
 		mockMvc.perform(get("/v1/item/507f191e810c19729de860ea")).andDo(print()).andExpect(status().isOk())
-				.andExpect(jsonPath("$.itemId").value("507f191e810c19729de860ea"))
-				.andExpect(jsonPath("$.itemName").value("Vaju"))
+				.andExpect(jsonPath("$.productId").value("507f191e810c19729de860ea"))
+				.andExpect(jsonPath("$.productName").value("Vaju"))
 				.andExpect(jsonPath("$.price").value(100))
 				.andExpect(jsonPath("$.shippingPrice").value(50));
 
