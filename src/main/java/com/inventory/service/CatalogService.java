@@ -26,7 +26,7 @@ public class CatalogService {
 		ProductResponse addItemResponse = new ProductResponse();
 		List<ValidationError> validationError = new ArrayList<>();
 		ResponseEntity<Product> product = restTemplate.getForEntity(uri + item.getProductId(), Product.class);
-		if(product.getStatusCodeValue() == HttpStatus.BAD_REQUEST.value()) {
+		if(product.getStatusCodeValue() == HttpStatus.NOT_FOUND.value()) {
 			validationError.add(new ValidationError(HttpStatus.BAD_REQUEST, "invalid product id"));
 		}
 		addItemResponse.setValidationError(validationError);
