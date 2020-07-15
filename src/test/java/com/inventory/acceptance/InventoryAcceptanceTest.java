@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class InventoryIntegrationTest {
+public class InventoryAcceptanceTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -24,11 +24,11 @@ public class InventoryIntegrationTest {
 	@Test
 	public void shouldReturnProductInformationForItemValidProductId() throws Exception {
 
-		mockMvc.perform(get("/v1/item/PD001")).andDo(print()).andExpect(status().isOk())
-		        .andExpect(jsonPath("$[0].sellerId").value("A1B2C5"))
-				.andExpect(jsonPath("$[0].item.productId").value("PD001"))
+		mockMvc.perform(get("/v1/item/507f191e810c19729de860ea")).andDo(print()).andExpect(status().isOk())
+		        .andExpect(jsonPath("$[0].sellerId").value("ABC1"))
+				.andExpect(jsonPath("$[0].item.productId").value("507f191e810c19729de860ea"))
 				.andExpect(jsonPath("$[0].item.price").value(100))
-				.andExpect(jsonPath("$[0].item.quantity").value(2))
+				.andExpect(jsonPath("$[0].item.quantity").value("2"))
 				.andExpect(jsonPath("$[0].item.shippingPrice").value(50));
 
 	}
@@ -36,16 +36,16 @@ public class InventoryIntegrationTest {
 	@Test
 	public void shouldReturnProductInformationForItemWithMultipleSellers() throws Exception {
 		
-		mockMvc.perform(get("/v1/item/PD002")).andDo(print()).andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].sellerId").value("A1B2C3"))
-				.andExpect(jsonPath("$[0].item.productId").value("PD002"))
-				.andExpect(jsonPath("$[0].item.price").value(200))
+		mockMvc.perform(get("/v1/item/507f191e810c19729de860eb")).andDo(print()).andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].sellerId").value("ABC1"))
+				.andExpect(jsonPath("$[0].item.productId").value("507f191e810c19729de860eb"))
+				.andExpect(jsonPath("$[0].item.price").value(900))
 				.andExpect(jsonPath("$[0].item.quantity").value("2"))
 				.andExpect(jsonPath("$[0].item.shippingPrice").value(50))
-				.andExpect(jsonPath("$[1].sellerId").value("A1B2C6"))
-				.andExpect(jsonPath("$[1].item.productId").value("PD002"))
-				.andExpect(jsonPath("$[1].item.price").value(150))
-				.andExpect(jsonPath("$[1].item.quantity").value(5))
+				.andExpect(jsonPath("$[1].sellerId").value("XYZ"))
+				.andExpect(jsonPath("$[1].item.productId").value("507f191e810c19729de860eb"))
+				.andExpect(jsonPath("$[1].item.price").value(850))
+				.andExpect(jsonPath("$[1].item.quantity").value("2"))
 				.andExpect(jsonPath("$[1].item.shippingPrice").value(50));
 	}
 

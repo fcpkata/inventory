@@ -22,14 +22,14 @@ public class ItemRepository implements Repository {
 
 	private void init() {
 		this.items = new ArrayList<>();
-		items.add(ProductInformation.builder().sellerId("A1B2C5")
-				.item(Item.builder().productId("PD001").price(100).quantity(2).shippingPrice(50).build())
+		items.add(ProductInformation.builder().sellerId("ABC1")
+				.item(Item.builder().productId("507f191e810c19729de860ea").price(100).quantity("2").shippingPrice(50).build())
 				.build());
-		items.add(ProductInformation.builder().sellerId("A1B2C3")
-				.item(Item.builder().productId("PD002").price(200).quantity(2).shippingPrice(50).build())
+		items.add(ProductInformation.builder().sellerId("ABC1")
+				.item(Item.builder().productId("507f191e810c19729de860eb").price(900).quantity("2").shippingPrice(50).build())
 				.build());
-		items.add(ProductInformation.builder().sellerId("A1B2C6")
-				.item(Item.builder().productId("PD002").price(150).quantity(5).shippingPrice(50).build())
+		items.add(ProductInformation.builder().sellerId("XYZ")
+				.item(Item.builder().productId("507f191e810c19729de860eb").price(850).quantity("2").shippingPrice(50).build())
 				.build());
 	}
 
