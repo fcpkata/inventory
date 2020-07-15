@@ -75,6 +75,7 @@ public class InventoryControllerTest {
 	
 	@Test
 	public void shouldReturnMultipleItems1() {
+		//EmptyTest case
 	}
 	}
 
