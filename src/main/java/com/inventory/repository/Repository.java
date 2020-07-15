@@ -1,9 +1,11 @@
 package com.inventory.repository;
 
-import com.inventory.model.Item;
+import java.util.List;
+
+import com.inventory.model.ProductInformation;
 
 public interface Repository {
 
-	Item fetchItemById(String itemId);
+	List<ProductInformation> fetchItemById(String itemId);
 
 }

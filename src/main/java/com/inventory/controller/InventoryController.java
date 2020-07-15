@@ -1,5 +1,7 @@
 package com.inventory.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -9,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.inventory.model.Item;
+import com.inventory.model.ProductInformation;
 import com.inventory.repository.ItemRepository;
 
 @RestController
@@ -24,9 +26,9 @@ public class InventoryController {
 	}
 
 	@GetMapping("/item/{itemId}")
-	public ResponseEntity<Item> getItem(@PathVariable(value = "itemId") String itemId) {
-		Item book = itemRepository.fetchItemById(itemId);
-		ResponseEntity<Item> response = new ResponseEntity<Item>(book, HttpStatus.OK);
+	public ResponseEntity<List<ProductInformation>> getItems(@PathVariable(value = "itemId") String itemId) {
+		List<ProductInformation> book = itemRepository.fetchItemById(itemId);
+		ResponseEntity<List<ProductInformation>> response = new ResponseEntity<List<ProductInformation>>(book, HttpStatus.OK);
 		return response;
 	}
 
