@@ -1,0 +1,10 @@
+{
+"sellerId" : "A1B2C3",
+"item" : {
+"productId" : "PD001",
+"quantity" : 50,
+"price" : 1200.99,
+"shippingPrice" : 50
+}
+
+}
