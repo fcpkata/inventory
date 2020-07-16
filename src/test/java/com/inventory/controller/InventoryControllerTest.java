@@ -14,6 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.inventory.model.DeleteItem;
 import com.inventory.model.Item;
 import com.inventory.model.ProductInformation;
 import com.inventory.repository.ItemRepository;
@@ -71,6 +72,28 @@ public class InventoryControllerTest {
 		items.add(itemOne);
 		items.add(itemTwo);
 		return items;
+	}
+	
+	@Test
+	public void shouldDeleteSingleQuantityOfItem() {
+		
+		List<ProductInformation> items = new ArrayList<ProductInformation>();
+		items.add(getSingleItem());
+		
+		Mockito.when(itemRepository.fetchItemById("507f191e810c19729de860ea")).thenReturn(items);
+
+		List<DeleteItem> deleteItemsList = new ArrayList<DeleteItem>();
+		DeleteItem deleteItem = DeleteItem.builder().itemId("507f191e810c19729de860ea").sellerId("ABC1").quatity(1).build();
+		deleteItemsList.add(deleteItem);
+		
+		Mockito.when(itemRepository.deleteItems(deleteItemsList)).thenReturn(items);
+		
+		
+		ResponseEntity<List<ProductInformation>> response = inventoryController.deleteItems(deleteItemsList);
+		
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody().get(0).getItem().getProductId()).isEqualTo("507f191e810c19729de860ea");
+		assertThat(response.getBody().get(0).getItem().getQuantity()).isEqualTo(2);
 	}
 
 }
