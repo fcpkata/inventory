@@ -30,7 +30,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import com.inventory.model.ProductRequest;
+import com.inventory.model.ProductInformation;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -40,8 +40,6 @@ public class InventoryIntegrationTest {
 	@Autowired
 	private MockMvc mockMvc;
 	
-	private ProductRequest user;
-	
 	private static ObjectMapper mapper;
 	
 	private MockHttpServletRequestBuilder requestBuilder;
@@ -50,14 +48,11 @@ public class InventoryIntegrationTest {
 	
 	@Autowired
 	private RestTemplate restTemplate;
+
+	private Object request;
 	
 	@Before
 	public void setup() throws FileNotFoundException, IOException {
-		Gson gson = new Gson();
-		ClassPathResource classPathResource = new ClassPathResource("addProduct.json");
-		JsonReader reader = new JsonReader(new FileReader(classPathResource.getFile()));
-		user = gson.fromJson(reader, ProductRequest.class);
-		mapper = new ObjectMapper();
 		
 		mockRestServiceServer =  MockRestServiceServer.createServer(restTemplate);
 	}
@@ -95,11 +90,33 @@ public class InventoryIntegrationTest {
 		
 		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/product/")))
 		.andRespond(withSuccess());
-		requestBuilder = post("/v1/item/");
-		requestBuilder.content(mapper.writeValueAsString(user));
+		requestBuilder = post("/v1/items/");
+		createRequest("addProduct.json");
+		requestBuilder.content(mapper.writeValueAsString(request));
 		requestBuilder.contentType(MediaType.APPLICATION_JSON);
 		mockMvc.perform(requestBuilder).andDo(print()).andExpect(status().isOk());
 
+	}
+	
+	@Test
+	public void shouldReturnErrorWhenSellerIdIsNotPresent() throws Exception {
+
+		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/product/")))
+		.andRespond(withSuccess());
+		requestBuilder = post("/v1/items/");
+		createRequest("addProduct_InvalidSellerId.json");
+		requestBuilder.content(mapper.writeValueAsString(request));
+		requestBuilder.contentType(MediaType.APPLICATION_JSON);
+		mockMvc.perform(requestBuilder).andDo(print()).andExpect(status().isBadRequest());
+
+	}
+	
+	private void createRequest(String fileName) throws FileNotFoundException, IOException {
+		Gson gson = new Gson();
+		ClassPathResource classPathResource = new ClassPathResource(fileName);
+		JsonReader reader = new JsonReader(new FileReader(classPathResource.getFile()));
+		request =  gson.fromJson(reader, ProductInformation.class);
+		mapper = new ObjectMapper();
 	}
 
 }

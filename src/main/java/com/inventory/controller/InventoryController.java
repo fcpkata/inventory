@@ -1,7 +1,6 @@
 package com.inventory.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
 
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.inventory.model.ProductInformation;
-import com.inventory.model.ProductResponse;
-import com.inventory.model.ProductRequest;
 import com.inventory.repository.ItemRepository;
 import com.inventory.service.AddItemService;
 
@@ -44,13 +41,14 @@ public class InventoryController {
 		return response;
 	}
 
-	@PostMapping("/item")
-	public ResponseEntity<ProductResponse> addItem(@NotNull @RequestBody ProductRequest user) {
+	@PostMapping("/items")
+	public ResponseEntity<String> addItem(@NotNull @RequestBody ProductInformation request) {
 		
-		ProductResponse response = addItemService.addItem(user);
-		return Optional.ofNullable(response.getValidationError()).filter(errors -> errors.size() > 0)
-		.map(value -> new ResponseEntity<ProductResponse>(response, HttpStatus.BAD_REQUEST))
-		.orElse(new ResponseEntity<ProductResponse>(response,HttpStatus.OK));
+		String response = addItemService.addItem(request);
+		if(response.equalsIgnoreCase("success"))
+			return new ResponseEntity<String>(HttpStatus.OK);
+		else
+			return new ResponseEntity<String>(response, HttpStatus.BAD_REQUEST);
 		
 	}
 }

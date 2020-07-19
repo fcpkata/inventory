@@ -8,10 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.inventory.exception.ValidationError;
 import com.inventory.model.Item;
 import com.inventory.model.Product;
-import com.inventory.model.ProductResponse;
 
 @Service
 public class CatalogService {
@@ -22,15 +20,13 @@ public class CatalogService {
 	}
 
 	String uri = "http://catalog-jx-production.35.224.175.156.nip.io/catalog/v1/product/";
-	public ProductResponse checkProductIsPresent(Item item) {
-		ProductResponse addItemResponse = new ProductResponse();
-		List<ValidationError> validationError = new ArrayList<>();
+	public List<String> checkProductIsPresent(Item item) {
+		List<String> errors = new ArrayList<>();
 		ResponseEntity<Product> product = restTemplate.getForEntity(uri + item.getProductId(), Product.class);
 		if(product.getStatusCodeValue() == HttpStatus.NOT_FOUND.value()) {
-			validationError.add(new ValidationError(HttpStatus.BAD_REQUEST, "invalid product id"));
+			errors.add("invalid product id");
 		}
-		addItemResponse.setValidationError(validationError);
-		return addItemResponse;
+		return errors;
 	}
 
 }

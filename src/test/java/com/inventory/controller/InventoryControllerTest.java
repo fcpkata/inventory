@@ -1,7 +1,6 @@
 package com.inventory.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -25,11 +24,8 @@ import org.springframework.http.ResponseEntity;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import com.inventory.exception.ValidationError;
 import com.inventory.model.Item;
 import com.inventory.model.ProductInformation;
-import com.inventory.model.ProductRequest;
-import com.inventory.model.ProductResponse;
 import com.inventory.repository.ItemRepository;
 import com.inventory.service.AddItemService;
 import com.inventory.service.CatalogService;
@@ -51,15 +47,15 @@ public class InventoryControllerTest {
 	@Mock
 	private AddItemService mockAddItemService;
 
-	private ProductRequest productRequest;
+	private ProductInformation request;
 
 	@Before
 	public void setup() throws FileNotFoundException, IOException {
 		Gson gson = new Gson();
 		ClassPathResource classPathResource = new ClassPathResource("addProduct.json");
 		JsonReader reader = new JsonReader(new FileReader(classPathResource.getFile()));
-		productRequest = gson.fromJson(reader, ProductRequest.class);
-		when(mockAddItemService.addItem(any())).thenReturn(new ProductResponse());
+		request = gson.fromJson(reader, ProductInformation.class);
+		when(mockAddItemService.addItem(any())).thenReturn("Success");
 		inventoryController = new InventoryController(mockItemRepository, mockAddItemService);
 	}
 
@@ -114,25 +110,18 @@ public class InventoryControllerTest {
 	@Test
 	public void shouldReturn200_whenProductIDIsPresent() throws FileNotFoundException, IOException {
 
-		ResponseEntity<ProductResponse> response = inventoryController.addItem(productRequest);
+		ResponseEntity<String> response = inventoryController.addItem(request);
 		assertThat(response.getStatusCodeValue()).isEqualTo(200);
-		assertNull(response.getBody().getValidationError());
 	}
 
 	@Test
 	public void shouldReturn400_whenProductIDIsNotPresent() throws FileNotFoundException, IOException {
-		List<ValidationError> validationError = new ArrayList<>();
-		validationError.add(new ValidationError(HttpStatus.BAD_REQUEST, "invalid product id"));
-		validationError.add(new ValidationError(HttpStatus.BAD_REQUEST, "invalid seller id"));
-		validationError.add(new ValidationError(HttpStatus.BAD_REQUEST, "user is not a registered seller"));
 
-		ProductResponse mockResponse = ProductResponse.builder().validationError(validationError).build();
-		when(mockAddItemService.addItem(any())).thenReturn(mockResponse);
-		ResponseEntity<ProductResponse> response = inventoryController.addItem(productRequest);
+		String errors = "invalid product id\nuser is not a registered seller";
+		when(mockAddItemService.addItem(any())).thenReturn(errors);
+		ResponseEntity<String> response = inventoryController.addItem(request);
 		assertThat(response.getStatusCodeValue()).isEqualTo(400);
-		assertThat(response.getBody().getValidationError().get(0).getMessage()).isEqualTo("invalid product id");
-		assertThat(response.getBody().getValidationError().get(1).getMessage()).isEqualTo("invalid seller id");
-		assertThat(response.getBody().getValidationError().get(2).getMessage()).isEqualTo("user is not a registered seller");
+		assertThat(response.getBody()).isEqualTo(errors);
 	}
 	
 }

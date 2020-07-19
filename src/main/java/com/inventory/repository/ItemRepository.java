@@ -41,4 +41,10 @@ public class ItemRepository implements Repository {
 				.orElseThrow(ItemNotFoundException::new);
 	}
 
+	public String saveItemToInventory(ProductInformation reqeust) {
+		items.add(reqeust);
+		return "success";
+		
+	}
+
 }

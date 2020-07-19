@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,7 +19,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.inventory.model.Item;
 import com.inventory.model.Product;
-import com.inventory.model.ProductResponse;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CatalogServiceTest {
@@ -43,17 +44,16 @@ public class CatalogServiceTest {
 	public void shouldReturnSuccess_WithValidProductId() {
 		ResponseEntity<Product> mockResponse = new ResponseEntity<Product>(new Product(), HttpStatus.OK);
 		when(mockRestTemplate.getForEntity(eq(url+"PD001"), eq(Product.class))).thenReturn(mockResponse);
-		ProductResponse response = service.checkProductIsPresent(item);
-		assertThat(response.getValidationError().size()).isEqualTo(0);
+		List<String> response = service.checkProductIsPresent(item);
+		assertThat(response.size()).isEqualTo(0);
 	}
 	
 	@Test
 	public void shouldReturnException_withInvalidProductId() {
 		ResponseEntity<Product> mockResponse = new ResponseEntity<Product>(new Product(), HttpStatus.NOT_FOUND);
 		when(mockRestTemplate.getForEntity(eq(url+"PD001"), eq(Product.class))).thenReturn(mockResponse);
-		ProductResponse response = service.checkProductIsPresent(item);
-		assertThat(response.getValidationError().get(0).getMessage()).isEqualTo("invalid product id");
-		assertThat(response.getValidationError().get(0).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		List<String> response = service.checkProductIsPresent(item);
+		assertThat(response.get(0)).isEqualTo("invalid product id");
 	}
 
 }
