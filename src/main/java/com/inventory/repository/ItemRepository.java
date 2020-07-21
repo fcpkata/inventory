@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.inventory.exception.ItemNotFoundException;
 import com.inventory.model.Item;
@@ -41,9 +43,13 @@ public class ItemRepository implements Repository {
 				.orElseThrow(ItemNotFoundException::new);
 	}
 
-	public String saveItemToInventory(ProductInformation reqeust) {
-		items.add(reqeust);
-		return "success";
+	public void saveItemToInventory(ProductInformation reqeust) {
+		try {
+			items.add(reqeust);
+		} catch (Exception e) {
+			throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY, "unable to add product to inventory");
+		}
+		
 		
 	}
 

@@ -2,7 +2,9 @@ package com.inventory.service;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.inventory.model.ProductInformation;
 import com.inventory.repository.ItemRepository;
@@ -22,17 +24,16 @@ public class AddItemService {
 		this.itemRepository = itemRepository;
 	}
 
-	public String addItem(ProductInformation reqeust) {
-
+	public void addItem(ProductInformation reqeust) {
 		List<String> errors = catalogService.checkProductIsPresent(reqeust.getItem());
 		errors = sellerIdValidationService.validateSellerId(errors, reqeust.getSellerId());
 		if(errors.size() > 0) {
 			StringBuilder sb = new StringBuilder();
 			errors.forEach(error -> sb.append(error).append("\n"));
-			return sb.toString();
-		}
-		else
-			return itemRepository.saveItemToInventory(reqeust);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, sb.toString());
+		} else
+			itemRepository.saveItemToInventory(reqeust);
+		
 	}
 
 }

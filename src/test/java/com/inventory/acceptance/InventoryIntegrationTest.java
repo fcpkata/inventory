@@ -100,7 +100,7 @@ public class InventoryIntegrationTest {
 	
 	@Test
 	public void shouldReturnErrorWhenSellerIdIsNotPresent() throws Exception {
-
+		
 		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/products/")))
 		.andRespond(withSuccess());
 		requestBuilder = post("/v1/items/");

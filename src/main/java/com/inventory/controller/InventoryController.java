@@ -2,6 +2,7 @@ package com.inventory.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +43,10 @@ public class InventoryController {
 	}
 
 	@PostMapping("/items")
-	public ResponseEntity<String> addItem(@NotNull @RequestBody ProductInformation request) {
-		
-		String response = addItemService.addItem(request);
-		if(response.equalsIgnoreCase("success"))
-			return new ResponseEntity<String>(HttpStatus.OK);
-		else
-			return new ResponseEntity<String>(response, HttpStatus.BAD_REQUEST);
-		
+	public ResponseEntity<String> addItem(@Valid @NotNull @RequestBody ProductInformation request) {	
+
+		addItemService.addItem(request);
+		return new ResponseEntity<String>(HttpStatus.OK);
+
 	}
 }

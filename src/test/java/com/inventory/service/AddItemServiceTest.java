@@ -1,7 +1,5 @@
 package com.inventory.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -11,10 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.inventory.model.Item;
 import com.inventory.model.ProductInformation;
@@ -33,32 +34,26 @@ public class AddItemServiceTest {
 
 	@Mock
 	private ItemRepository mockItemRepository;
+	
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 
 	@Before
 	public void setup() {
 		
-		List<String> errors = new ArrayList<>();
-		when(mockCatalogService.checkProductIsPresent(any())).thenReturn(errors);
-		when(mockSellerIdValidationService.validateSellerId(any(), any())).thenReturn(errors);
+		mockErrorResponseFromCatalogService();
+		mockErrorResponseFromSellerIdValidationService();
 		addItemService = new AddItemService(mockCatalogService, mockSellerIdValidationService, mockItemRepository);
-	}
-
-	@Test
-	public void shouldReturnSuccess_WithValidInformation() throws FileNotFoundException, IOException {
-		ProductInformation request =  ProductInformation.builder().sellerId("A1B2C3").build();
-		String response = addItemService.addItem(request);
-		assertNull(response);
 	}
 	
 	@Test
 	public void shouldReturn400_whenProductIDIsNotPresent() throws FileNotFoundException, IOException {
 		
-		mockErrorResponseFromCatalogService();
-		mockErrorResponseFromSellerIdValidationService();
+		expectedException.expect(ResponseStatusException.class);
+		expectedException.expectMessage("invalid product id\nuser is not a registered seller\n");
 		Item item = Item.builder().productId("INVALID").build();
 		ProductInformation request = ProductInformation.builder().sellerId("A1B2C4").item(item).build();
-		String response = addItemService.addItem(request);
-		assertThat(response).isEqualTo("invalid product id\nuser is not a registered seller\n");
+		addItemService.addItem(request);
 		
 	}
 

@@ -2,6 +2,8 @@ package com.inventory.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
@@ -16,11 +18,11 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -55,7 +57,7 @@ public class InventoryControllerTest {
 		ClassPathResource classPathResource = new ClassPathResource("addProduct.json");
 		JsonReader reader = new JsonReader(new FileReader(classPathResource.getFile()));
 		request = gson.fromJson(reader, ProductInformation.class);
-		when(mockAddItemService.addItem(any())).thenReturn("Success");
+		doNothing().when(mockAddItemService).addItem(any());
 		inventoryController = new InventoryController(mockItemRepository, mockAddItemService);
 	}
 
@@ -66,7 +68,7 @@ public class InventoryControllerTest {
 		List<ProductInformation> items = new ArrayList<ProductInformation>();
 		items.add(getSingleItem());
 		
-		Mockito.when(mockItemRepository.fetchItemById("507f191e810c19729de860ea")).thenReturn(items);
+		when(mockItemRepository.fetchItemById("507f191e810c19729de860ea")).thenReturn(items);
 		ResponseEntity<List<ProductInformation>> response = inventoryController.getItems("507f191e810c19729de860ea");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -78,7 +80,7 @@ public class InventoryControllerTest {
 		List<ProductInformation> items = new ArrayList<ProductInformation>();
 		items.add(getSingleItem());
 		items.addAll(getMultipleItems());
-		Mockito.when(mockItemRepository.fetchItemById("507f191e810c19729de860eb")).thenReturn(items);
+		when(mockItemRepository.fetchItemById("507f191e810c19729de860eb")).thenReturn(items);
 
 		ResponseEntity<List<ProductInformation>> response = inventoryController.getItems("507f191e810c19729de860eb");
 
@@ -116,12 +118,10 @@ public class InventoryControllerTest {
 
 	@Test
 	public void shouldReturn400_whenProductIDIsNotPresent() throws FileNotFoundException, IOException {
-
-		String errors = "invalid product id\nuser is not a registered seller";
-		when(mockAddItemService.addItem(any())).thenReturn(errors);
-		ResponseEntity<String> response = inventoryController.addItem(request);
-		assertThat(response.getStatusCodeValue()).isEqualTo(400);
-		assertThat(response.getBody()).isEqualTo(errors);
+		expectedException.expect(HttpClientErrorException.class);
+		expectedException.expectMessage("invalid product id\nuser is not a registered seller\n");
+		doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "invalid product id\nuser is not a registered seller\n")).when(mockAddItemService).addItem(any());
+		inventoryController.addItem(request);
 	}
 	
 }
