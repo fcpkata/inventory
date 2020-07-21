@@ -19,8 +19,8 @@ public class CatalogService {
 		this.restTemplate = restTemplate;
 	}
 
-	String uri = "http://catalog-jx-production.35.224.175.156.nip.io/catalog/v1/product/";
 	public List<String> checkProductIsPresent(Item item) {
+		String uri = System.getProperty("catalogService");
 		List<String> errors = new ArrayList<>();
 		ResponseEntity<Product> product = restTemplate.getForEntity(uri + item.getProductId(), Product.class);
 		if(product.getStatusCodeValue() == HttpStatus.NOT_FOUND.value()) {

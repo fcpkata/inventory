@@ -88,7 +88,7 @@ public class InventoryIntegrationTest {
 	@Test
 	public void shouldReturnSuccessForAddPrdocutDetails() throws Exception {
 		
-		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/product/")))
+		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/products/")))
 		.andRespond(withSuccess());
 		requestBuilder = post("/v1/items/");
 		createRequest("addProduct.json");
@@ -101,7 +101,7 @@ public class InventoryIntegrationTest {
 	@Test
 	public void shouldReturnErrorWhenSellerIdIsNotPresent() throws Exception {
 
-		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/product/")))
+		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/products/")))
 		.andRespond(withSuccess());
 		requestBuilder = post("/v1/items/");
 		createRequest("addProduct_InvalidSellerId.json");
