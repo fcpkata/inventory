@@ -90,7 +90,7 @@ public class InventoryIntegrationTest {
 		
 		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/products/")))
 		.andRespond(withSuccess());
-		requestBuilder = post("/v1/items/");
+		requestBuilder = post("/v1/inventory/");
 		createRequest("addProduct.json");
 		requestBuilder.content(mapper.writeValueAsString(request));
 		requestBuilder.contentType(MediaType.APPLICATION_JSON);
@@ -103,7 +103,7 @@ public class InventoryIntegrationTest {
 		
 		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/products/")))
 		.andRespond(withSuccess());
-		requestBuilder = post("/v1/items/");
+		requestBuilder = post("/v1/inventory/");
 		createRequest("addProduct_InvalidSellerId.json");
 		requestBuilder.content(mapper.writeValueAsString(request));
 		requestBuilder.contentType(MediaType.APPLICATION_JSON);

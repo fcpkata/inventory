@@ -36,13 +36,13 @@ public class InventoryController {
 	}
 
 	@GetMapping("/item/{itemId}")
-	public ResponseEntity<List<ProductInformation>> getItems(@PathVariable(value = "itemId") String itemId) {
+	public ResponseEntity<List<ProductInformation>> addInventory(@PathVariable(value = "itemId") String itemId) {
 		List<ProductInformation> book = itemRepository.fetchItemById(itemId);
 		ResponseEntity<List<ProductInformation>> response = new ResponseEntity<List<ProductInformation>>(book, HttpStatus.OK);
 		return response;
 	}
 
-	@PostMapping("/items")
+	@PostMapping("/inventory")
 	public ResponseEntity<String> addItem(@Valid @NotNull @RequestBody ProductInformation request) {	
 
 		addItemService.addItem(request);

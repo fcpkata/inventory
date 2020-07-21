@@ -69,7 +69,7 @@ public class InventoryControllerTest {
 		items.add(getSingleItem());
 		
 		when(mockItemRepository.fetchItemById("507f191e810c19729de860ea")).thenReturn(items);
-		ResponseEntity<List<ProductInformation>> response = inventoryController.getItems("507f191e810c19729de860ea");
+		ResponseEntity<List<ProductInformation>> response = inventoryController.addInventory("507f191e810c19729de860ea");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(response.getBody()).isEqualTo(items);
@@ -82,7 +82,7 @@ public class InventoryControllerTest {
 		items.addAll(getMultipleItems());
 		when(mockItemRepository.fetchItemById("507f191e810c19729de860eb")).thenReturn(items);
 
-		ResponseEntity<List<ProductInformation>> response = inventoryController.getItems("507f191e810c19729de860eb");
+		ResponseEntity<List<ProductInformation>> response = inventoryController.addInventory("507f191e810c19729de860eb");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(response.getBody()).isEqualTo(items);
