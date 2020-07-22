@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +85,7 @@ public class InventoryIntegrationTest {
 				.andExpect(jsonPath("$[1].item.quantity").value(5))
 				.andExpect(jsonPath("$[1].item.shippingPrice").value(50));
 	}
-	
+	@Ignore
 	@Test
 	public void shouldReturnSuccessForAddPrdocutDetails() throws Exception {
 		
@@ -97,7 +98,7 @@ public class InventoryIntegrationTest {
 		mockMvc.perform(requestBuilder).andDo(print()).andExpect(status().isOk());
 
 	}
-	
+	@Ignore
 	@Test
 	public void shouldReturnErrorWhenSellerIdIsNotPresent() throws Exception {
 		

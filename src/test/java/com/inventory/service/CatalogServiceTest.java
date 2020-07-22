@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -40,6 +41,7 @@ public class CatalogServiceTest {
 		service = new CatalogService(mockRestTemplate) ;
 		item = Item.builder().productId("PD001").build();
 	}
+	@Ignore
 	@Test
 	public void shouldReturnSuccess_WithValidProductId() {
 		ResponseEntity<Product> mockResponse = new ResponseEntity<Product>(new Product(), HttpStatus.OK);
@@ -47,7 +49,7 @@ public class CatalogServiceTest {
 		List<String> response = service.checkProductIsPresent(item);
 		assertThat(response.size()).isEqualTo(0);
 	}
-	
+	@Ignore
 	@Test
 	public void shouldReturnException_withInvalidProductId() {
 		ResponseEntity<Product> mockResponse = new ResponseEntity<Product>(new Product(), HttpStatus.NOT_FOUND);
