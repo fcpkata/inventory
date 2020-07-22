@@ -24,7 +24,7 @@ public class CatalogService {
 	}
 
 	public List<String> checkProductIsPresent(Item item) {
-		String uri = System.getProperty("catalogService");
+		String uri = System.getenv("catalogService");
 		log.info("Calling catalog service to check product details " + uri);
 		List<String> errors = new ArrayList<>();
 		if(StringUtils.isEmpty(item.getProductId()))
