@@ -12,7 +12,10 @@ import org.springframework.web.client.RestTemplate;
 import com.inventory.model.Item;
 import com.inventory.model.Product;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class CatalogService {
 	private RestTemplate restTemplate;
 
@@ -22,6 +25,7 @@ public class CatalogService {
 
 	public List<String> checkProductIsPresent(Item item) {
 		String uri = System.getProperty("catalogService");
+		log.info("Calling catalog service to check product details " + uri);
 		List<String> errors = new ArrayList<>();
 		if(StringUtils.isEmpty(item.getProductId()))
 			return createError(errors);
