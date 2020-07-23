@@ -28,6 +28,7 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.inventory.model.Item;
 import com.inventory.model.ProductInformation;
+import com.inventory.model.ProductInformations;
 import com.inventory.repository.ItemRepository;
 import com.inventory.service.AddItemService;
 import com.inventory.service.CatalogService;
@@ -69,10 +70,10 @@ public class InventoryControllerTest {
 		items.add(getSingleItem());
 		
 		when(mockItemRepository.fetchItemById("507f191e810c19729de860ea")).thenReturn(items);
-		ResponseEntity<List<ProductInformation>> response = inventoryController.addInventory("507f191e810c19729de860ea");
+		ResponseEntity<ProductInformations> response = inventoryController.addInventory("507f191e810c19729de860ea");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getBody()).isEqualTo(items);
+		assertThat(response.getBody().getProductInformations()).isEqualTo(items);
 	}
 
 	@Test
@@ -82,25 +83,25 @@ public class InventoryControllerTest {
 		items.addAll(getMultipleItems());
 		when(mockItemRepository.fetchItemById("507f191e810c19729de860eb")).thenReturn(items);
 
-		ResponseEntity<List<ProductInformation>> response = inventoryController.addInventory("507f191e810c19729de860eb");
+		ResponseEntity<ProductInformations> response = inventoryController.addInventory("507f191e810c19729de860eb");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getBody()).isEqualTo(items);
+		assertThat(response.getBody().getProductInformations()).isEqualTo(items);
 	}
 
 	private ProductInformation getSingleItem() {
 		ProductInformation item =ProductInformation.builder().sellerId("ABC1")
-				.item(Item.builder().productId("507f191e810c19729de860ea").price(100).quantity(2).shippingPrice(50).build())
+				.item(Item.builder().productId("507f191e810c19729de860ea").price(100).quantity(2).build())
 				.build();
 		return item;
 	}
 
 	private List<ProductInformation> getMultipleItems() {
 		ProductInformation itemOne = ProductInformation.builder().sellerId("ABC1")
-				.item(Item.builder().productId("507f191e810c19729de860eb").price(900).quantity(2).shippingPrice(50).build())
+				.item(Item.builder().productId("507f191e810c19729de860eb").price(900).quantity(2).build())
 				.build();
 		ProductInformation itemTwo = ProductInformation.builder().sellerId("XYZ")
-				.item(Item.builder().productId("507f191e810c19729de860eb").price(850).quantity(2).shippingPrice(50).build())
+				.item(Item.builder().productId("507f191e810c19729de860eb").price(850).quantity(2).build())
 				.build();
 		List<ProductInformation> items = new ArrayList<ProductInformation>();
 		items.add(itemOne);

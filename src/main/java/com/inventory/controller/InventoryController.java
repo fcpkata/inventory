@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.inventory.model.ProductInformation;
+import com.inventory.model.ProductInformations;
 import com.inventory.repository.ItemRepository;
 import com.inventory.service.AddItemService;
 
@@ -36,10 +37,10 @@ public class InventoryController {
 	}
 
 	@GetMapping("/item/{itemId}")
-	public ResponseEntity<List<ProductInformation>> addInventory(@PathVariable(value = "itemId") String itemId) {
-		List<ProductInformation> book = itemRepository.fetchItemById(itemId);
-		ResponseEntity<List<ProductInformation>> response = new ResponseEntity<List<ProductInformation>>(book, HttpStatus.OK);
-		return response;
+	public ResponseEntity<ProductInformations> addInventory(@PathVariable(value = "itemId") String itemId) {
+		List<ProductInformation> productInfoList = itemRepository.fetchItemById(itemId);
+		ProductInformations response = ProductInformations.builder().productInformations(productInfoList).build();
+		return new ResponseEntity<ProductInformations>(response, HttpStatus.OK);
 	}
 
 	@PostMapping("/inventory")

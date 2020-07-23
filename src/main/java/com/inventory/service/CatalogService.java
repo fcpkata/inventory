@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.inventory.model.Item;
@@ -34,9 +34,12 @@ public class CatalogService {
 	}
 
 	private List<String> callCatalogService(String productId, String uri, List<String> errors) {
-		ResponseEntity<Product> product = restTemplate.getForEntity(uri + productId, Product.class);
-		if(product.getStatusCodeValue() == HttpStatus.NOT_FOUND.value()) 
-			errors = createError(errors);
+		try {
+			restTemplate.getForEntity(uri + productId, Product.class);
+		} catch(HttpClientErrorException ex) {
+			if(ex.getStatusCode() == HttpStatus.NOT_FOUND)
+				errors = createError(errors);
+		}
 		return errors;
 	}
 

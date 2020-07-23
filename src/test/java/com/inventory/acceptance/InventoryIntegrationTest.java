@@ -13,7 +13,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,11 +61,10 @@ public class InventoryIntegrationTest {
 	public void shouldReturnProductInformationForItemValidProductId() throws Exception {
 
 		mockMvc.perform(get("/v1/item/PD001")).andDo(print()).andExpect(status().isOk())
-		        .andExpect(jsonPath("$[0].sellerId").value("A1B2C5"))
-				.andExpect(jsonPath("$[0].item.productId").value("PD001"))
-				.andExpect(jsonPath("$[0].item.price").value(100))
-				.andExpect(jsonPath("$[0].item.quantity").value(2))
-				.andExpect(jsonPath("$[0].item.shippingPrice").value(50));
+		        .andExpect(jsonPath("$.productInformations.[0].sellerId").value("A1B2C5"))
+				.andExpect(jsonPath("$.productInformations.[0].item.productId").value("PD001"))
+				.andExpect(jsonPath("$.productInformations.[0].item.price").value(100))
+				.andExpect(jsonPath("$.productInformations.[0].item.quantity").value(2));
 
 	}
 	
@@ -74,18 +72,15 @@ public class InventoryIntegrationTest {
 	public void shouldReturnProductInformationForItemWithMultipleSellers() throws Exception {
 		
 		mockMvc.perform(get("/v1/item/PD002")).andDo(print()).andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].sellerId").value("A1B2C3"))
-				.andExpect(jsonPath("$[0].item.productId").value("PD002"))
-				.andExpect(jsonPath("$[0].item.price").value(200))
-				.andExpect(jsonPath("$[0].item.quantity").value("2"))
-				.andExpect(jsonPath("$[0].item.shippingPrice").value(50))
-				.andExpect(jsonPath("$[1].sellerId").value("A1B2C6"))
-				.andExpect(jsonPath("$[1].item.productId").value("PD002"))
-				.andExpect(jsonPath("$[1].item.price").value(150))
-				.andExpect(jsonPath("$[1].item.quantity").value(5))
-				.andExpect(jsonPath("$[1].item.shippingPrice").value(50));
+				.andExpect(jsonPath("$.productInformations.[0].sellerId").value("A1B2C3"))
+				.andExpect(jsonPath("$.productInformations.[0].item.productId").value("PD002"))
+				.andExpect(jsonPath("$.productInformations.[0].item.price").value(200))
+				.andExpect(jsonPath("$.productInformations.[0].item.quantity").value("2"))
+				.andExpect(jsonPath("$.productInformations.[1].sellerId").value("A1B2C6"))
+				.andExpect(jsonPath("$.productInformations.[1].item.productId").value("PD002"))
+				.andExpect(jsonPath("$.productInformations.[1].item.price").value(150))
+				.andExpect(jsonPath("$.productInformations.[1].item.quantity").value(5));
 	}
-	@Ignore
 	@Test
 	public void shouldReturnSuccessForAddPrdocutDetails() throws Exception {
 		
@@ -98,7 +93,6 @@ public class InventoryIntegrationTest {
 		mockMvc.perform(requestBuilder).andDo(print()).andExpect(status().isOk());
 
 	}
-	@Ignore
 	@Test
 	public void shouldReturnErrorWhenSellerIdIsNotPresent() throws Exception {
 		
