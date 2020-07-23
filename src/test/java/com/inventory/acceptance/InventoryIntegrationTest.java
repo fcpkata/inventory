@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,7 @@ public class InventoryIntegrationTest {
 				.andExpect(jsonPath("$.productInformations.[1].item.quantity").value(5));
 	}
 	@Test
+	@Ignore
 	public void shouldReturnSuccessForAddPrdocutDetails() throws Exception {
 		
 		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/products/")))
@@ -94,6 +96,7 @@ public class InventoryIntegrationTest {
 
 	}
 	@Test
+	@Ignore
 	public void shouldReturnErrorWhenSellerIdIsNotPresent() throws Exception {
 		
 		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/products/")))
