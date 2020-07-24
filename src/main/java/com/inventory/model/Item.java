@@ -2,6 +2,9 @@ package com.inventory.model;
 
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,11 +16,12 @@ import lombok.ToString;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Item {
 	
-	@NotNull(message = "Required 'id' is not present")
+	@JsonProperty(required = true)
+	@NotNull(message = "Required 'productId' is not present")
 	private String productId;
 	private double price;
 	private int quantity;
-	private int shippingPrice;
 }

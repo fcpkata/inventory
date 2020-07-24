@@ -1,0 +1,10 @@
+{
+"sellerId" : "Invalid",
+"item" : {
+"productId" : "PD001",
+"quantity" : 50,
+"price" : 1200.99,
+"shippingPrice" : 50
+}
+
+}

@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import com.inventory.model.ProductRequest;
+import com.inventory.model.ProductInformation;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -40,8 +41,6 @@ public class InventoryIntegrationTest {
 	@Autowired
 	private MockMvc mockMvc;
 	
-	private ProductRequest user;
-	
 	private static ObjectMapper mapper;
 	
 	private MockHttpServletRequestBuilder requestBuilder;
@@ -50,14 +49,11 @@ public class InventoryIntegrationTest {
 	
 	@Autowired
 	private RestTemplate restTemplate;
+
+	private Object request;
 	
 	@Before
 	public void setup() throws FileNotFoundException, IOException {
-		Gson gson = new Gson();
-		ClassPathResource classPathResource = new ClassPathResource("addProduct.json");
-		JsonReader reader = new JsonReader(new FileReader(classPathResource.getFile()));
-		user = gson.fromJson(reader, ProductRequest.class);
-		mapper = new ObjectMapper();
 		
 		mockRestServiceServer =  MockRestServiceServer.createServer(restTemplate);
 	}
@@ -66,11 +62,10 @@ public class InventoryIntegrationTest {
 	public void shouldReturnProductInformationForItemValidProductId() throws Exception {
 
 		mockMvc.perform(get("/v1/item/PD001")).andDo(print()).andExpect(status().isOk())
-		        .andExpect(jsonPath("$[0].sellerId").value("A1B2C5"))
-				.andExpect(jsonPath("$[0].item.productId").value("PD001"))
-				.andExpect(jsonPath("$[0].item.price").value(100))
-				.andExpect(jsonPath("$[0].item.quantity").value(2))
-				.andExpect(jsonPath("$[0].item.shippingPrice").value(50));
+		        .andExpect(jsonPath("$.productInformations.[0].sellerId").value("A1B2C5"))
+				.andExpect(jsonPath("$.productInformations.[0].item.productId").value("PD001"))
+				.andExpect(jsonPath("$.productInformations.[0].item.price").value(100))
+				.andExpect(jsonPath("$.productInformations.[0].item.quantity").value(2));
 
 	}
 	
@@ -78,28 +73,48 @@ public class InventoryIntegrationTest {
 	public void shouldReturnProductInformationForItemWithMultipleSellers() throws Exception {
 		
 		mockMvc.perform(get("/v1/item/PD002")).andDo(print()).andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].sellerId").value("A1B2C3"))
-				.andExpect(jsonPath("$[0].item.productId").value("PD002"))
-				.andExpect(jsonPath("$[0].item.price").value(200))
-				.andExpect(jsonPath("$[0].item.quantity").value("2"))
-				.andExpect(jsonPath("$[0].item.shippingPrice").value(50))
-				.andExpect(jsonPath("$[1].sellerId").value("A1B2C6"))
-				.andExpect(jsonPath("$[1].item.productId").value("PD002"))
-				.andExpect(jsonPath("$[1].item.price").value(150))
-				.andExpect(jsonPath("$[1].item.quantity").value(5))
-				.andExpect(jsonPath("$[1].item.shippingPrice").value(50));
+				.andExpect(jsonPath("$.productInformations.[0].sellerId").value("A1B2C3"))
+				.andExpect(jsonPath("$.productInformations.[0].item.productId").value("PD002"))
+				.andExpect(jsonPath("$.productInformations.[0].item.price").value(200))
+				.andExpect(jsonPath("$.productInformations.[0].item.quantity").value("2"))
+				.andExpect(jsonPath("$.productInformations.[1].sellerId").value("A1B2C6"))
+				.andExpect(jsonPath("$.productInformations.[1].item.productId").value("PD002"))
+				.andExpect(jsonPath("$.productInformations.[1].item.price").value(150))
+				.andExpect(jsonPath("$.productInformations.[1].item.quantity").value(5));
 	}
-	
 	@Test
+	@Ignore
 	public void shouldReturnSuccessForAddPrdocutDetails() throws Exception {
 		
-		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/product/")))
+		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/products/")))
 		.andRespond(withSuccess());
-		requestBuilder = post("/v1/item/");
-		requestBuilder.content(mapper.writeValueAsString(user));
+		requestBuilder = post("/v1/inventory/");
+		createRequest("addProduct.json");
+		requestBuilder.content(mapper.writeValueAsString(request));
 		requestBuilder.contentType(MediaType.APPLICATION_JSON);
 		mockMvc.perform(requestBuilder).andDo(print()).andExpect(status().isOk());
 
+	}
+	@Test
+	@Ignore
+	public void shouldReturnErrorWhenSellerIdIsNotPresent() throws Exception {
+		
+		mockRestServiceServer.expect(MockRestRequestMatchers.requestTo(containsString("/catalog/v1/products/")))
+		.andRespond(withSuccess());
+		requestBuilder = post("/v1/inventory/");
+		createRequest("addProduct_InvalidSellerId.json");
+		requestBuilder.content(mapper.writeValueAsString(request));
+		requestBuilder.contentType(MediaType.APPLICATION_JSON);
+		mockMvc.perform(requestBuilder).andDo(print()).andExpect(status().isBadRequest());
+
+	}
+	
+	private void createRequest(String fileName) throws FileNotFoundException, IOException {
+		Gson gson = new Gson();
+		ClassPathResource classPathResource = new ClassPathResource(fileName);
+		JsonReader reader = new JsonReader(new FileReader(classPathResource.getFile()));
+		request =  gson.fromJson(reader, ProductInformation.class);
+		mapper = new ObjectMapper();
 	}
 
 }

@@ -1,6 +1,5 @@
 package com.inventory.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -10,17 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-import com.inventory.exception.ValidationError;
 import com.inventory.model.Item;
-import com.inventory.model.ProductRequest;
-import com.inventory.model.ProductResponse;
-import com.inventory.repository.SellerIdRepository;
+import com.inventory.model.ProductInformation;
+import com.inventory.repository.ItemRepository;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AddItemServiceTest {
@@ -29,70 +28,47 @@ public class AddItemServiceTest {
 	
 	@Mock
 	private CatalogService mockCatalogService;
+	
+	@Mock
+	private SellerIdValidationService mockSellerIdValidationService;
+
+	@Mock
+	private ItemRepository mockItemRepository;
+	
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 
 	@Before
 	public void setup() {
 		
-		List<ValidationError> validationError = new ArrayList<>();
-		ProductResponse mockProductResponse  = ProductResponse.builder().validationError(validationError).build();
-		when(mockCatalogService.checkProductIsPresent(any())).thenReturn(mockProductResponse);
-		addItemService = new AddItemService(mockCatalogService, new SellerIdRepository());
-	}
-
-	@Test
-	public void shouldReturnError_WhenSellarIdIsInvalid() throws FileNotFoundException, IOException {
-
-		ProductRequest productRequest =  ProductRequest.builder().sellerId("Invalid").build();
-		ProductResponse response = addItemService.addItem(productRequest);
-		assertThat(response.getValidationError().get(0).getMessage()).isEqualTo("invalid seller id");
-	}
-
-	@Test
-	public void shouldReturnError_WhenUserIsNotASeller() throws FileNotFoundException, IOException {
-		
-		ProductRequest productRequest =  ProductRequest.builder().sellerId("A1B2C4").build();
-		ProductResponse response = addItemService.addItem(productRequest);
-		assertThat(response.getValidationError().get(0).getMessage()).isEqualTo("user is not a registered seller");
-	}
-	
-	@Test
-	public void shouldReturnSuccess_WhenSellarIdIsValid() throws FileNotFoundException, IOException {
-		ProductRequest productRequest =  ProductRequest.builder().sellerId("A1B2C3").build();
-		ProductResponse response = addItemService.addItem(productRequest);
-		assertThat(response.getValidationError().size()).isEqualTo(0);
+		mockErrorResponseFromCatalogService();
+		mockErrorResponseFromSellerIdValidationService();
+		addItemService = new AddItemService(mockCatalogService, mockSellerIdValidationService, mockItemRepository);
 	}
 	
 	@Test
 	public void shouldReturn400_whenProductIDIsNotPresent() throws FileNotFoundException, IOException {
 		
+		expectedException.expect(ResponseStatusException.class);
+		expectedException.expectMessage("invalid product id\nuser is not a registered seller\n");
 		Item item = Item.builder().productId("INVALID").build();
-		ProductRequest productRequest =  ProductRequest.builder().sellerId("A1B2C4").item(item).build();
-		List<ValidationError> validationError = new ArrayList<>();
-		validationError.add(new ValidationError(HttpStatus.BAD_REQUEST, "invalid product id"));
-		ProductResponse mockResponse = ProductResponse.builder().validationError(validationError).build();
-		when(mockCatalogService.checkProductIsPresent(any())).thenReturn(mockResponse);
-		ProductResponse response = addItemService.addItem(productRequest);
-		assertThat(response.getValidationError().get(0).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-		assertThat(response.getValidationError().get(0).getMessage()).isEqualTo("invalid product id");
+		ProductInformation request = ProductInformation.builder().sellerId("A1B2C4").item(item).build();
+		addItemService.addItem(request);
 		
 	}
-	
-	
-	@Test
-	public void shouldReturnMultipleErrors_whenProductIDAndSellerIsNotPresent() throws FileNotFoundException, IOException {
+
+	private void mockErrorResponseFromSellerIdValidationService() {
+		List<String> errors = new ArrayList<>();
+		errors.add("invalid product id");
+		errors.add("user is not a registered seller");
+		when(mockSellerIdValidationService.validateSellerId(any(), any())).thenReturn(errors);
 		
-		Item item = Item.builder().productId("INVALID").build();
-		ProductRequest productRequest =  ProductRequest.builder().sellerId("INVALID").item(item).build();
-		List<ValidationError> validationError = new ArrayList<>();
-		validationError.add(new ValidationError(HttpStatus.BAD_REQUEST, "invalid product id"));
-		ProductResponse mockResponse = ProductResponse.builder().validationError(validationError).build();
-		when(mockCatalogService.checkProductIsPresent(any())).thenReturn(mockResponse);
-		ProductResponse response = addItemService.addItem(productRequest);
-		assertThat(response.getValidationError().get(0).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-		assertThat(response.getValidationError().get(0).getMessage()).isEqualTo("invalid product id");
-		assertThat(response.getValidationError().get(1).getMessage()).isEqualTo("invalid seller id");
-		assertThat(response.getValidationError().get(2).getMessage()).isEqualTo("user is not a registered seller");
-		
+	}
+
+	private void mockErrorResponseFromCatalogService() {
+		List<String> errors = new ArrayList<>();
+		errors.add("invalid product id");
+		when(mockCatalogService.checkProductIsPresent(any())).thenReturn(errors);
 	}
 
 }

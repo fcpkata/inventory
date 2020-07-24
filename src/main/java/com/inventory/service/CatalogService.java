@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.inventory.exception.ValidationError;
 import com.inventory.model.Item;
 import com.inventory.model.Product;
-import com.inventory.model.ProductResponse;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class CatalogService {
 	private RestTemplate restTemplate;
 
@@ -21,16 +23,29 @@ public class CatalogService {
 		this.restTemplate = restTemplate;
 	}
 
-	String uri = "http://catalog-jx-production.35.224.175.156.nip.io/catalog/v1/product/";
-	public ProductResponse checkProductIsPresent(Item item) {
-		ProductResponse addItemResponse = new ProductResponse();
-		List<ValidationError> validationError = new ArrayList<>();
-		ResponseEntity<Product> product = restTemplate.getForEntity(uri + item.getProductId(), Product.class);
-		if(product.getStatusCodeValue() == HttpStatus.NOT_FOUND.value()) {
-			validationError.add(new ValidationError(HttpStatus.BAD_REQUEST, "invalid product id"));
+	public List<String> checkProductIsPresent(Item item) {
+		String uri = System.getenv("catalogService");
+		log.info("Calling catalog service to check product details " + uri);
+		List<String> errors = new ArrayList<>();
+		if(StringUtils.isEmpty(item.getProductId()))
+			return createError(errors);
+
+		return callCatalogService(item.getProductId(), uri, errors);
+	}
+
+	private List<String> callCatalogService(String productId, String uri, List<String> errors) {
+		try {
+			restTemplate.getForEntity(uri + productId, Product.class);
+		} catch(HttpClientErrorException ex) {
+			if(ex.getStatusCode() == HttpStatus.NOT_FOUND)
+				errors = createError(errors);
 		}
-		addItemResponse.setValidationError(validationError);
-		return addItemResponse;
+		return errors;
+	}
+
+	private List<String> createError(List<String> errors) {
+		errors.add("invalid product id");
+		return errors;
 	}
 
 }

@@ -1,8 +1,8 @@
 package com.inventory.controller;
 
 import java.util.List;
-import java.util.Optional;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.inventory.model.ProductInformation;
-import com.inventory.model.ProductResponse;
-import com.inventory.model.ProductRequest;
+import com.inventory.model.ProductInformations;
 import com.inventory.repository.ItemRepository;
 import com.inventory.service.AddItemService;
 
@@ -38,19 +37,17 @@ public class InventoryController {
 	}
 
 	@GetMapping("/item/{itemId}")
-	public ResponseEntity<List<ProductInformation>> getItems(@PathVariable(value = "itemId") String itemId) {
-		List<ProductInformation> book = itemRepository.fetchItemById(itemId);
-		ResponseEntity<List<ProductInformation>> response = new ResponseEntity<List<ProductInformation>>(book, HttpStatus.OK);
-		return response;
+	public ResponseEntity<ProductInformations> addInventory(@PathVariable(value = "itemId") String itemId) {
+		List<ProductInformation> productInfoList = itemRepository.fetchItemById(itemId);
+		ProductInformations response = ProductInformations.builder().productInformations(productInfoList).build();
+		return new ResponseEntity<ProductInformations>(response, HttpStatus.OK);
 	}
 
-	@PostMapping("/item")
-	public ResponseEntity<ProductResponse> addItem(@NotNull @RequestBody ProductRequest user) {
-		
-		ProductResponse response = addItemService.addItem(user);
-		return Optional.ofNullable(response.getValidationError()).filter(errors -> errors.size() > 0)
-		.map(value -> new ResponseEntity<ProductResponse>(response, HttpStatus.BAD_REQUEST))
-		.orElse(new ResponseEntity<ProductResponse>(response,HttpStatus.OK));
-		
+	@PostMapping("/inventory")
+	public ResponseEntity<String> addItem(@Valid @NotNull @RequestBody ProductInformation request) {	
+
+		addItemService.addItem(request);
+		return new ResponseEntity<String>(HttpStatus.OK);
+
 	}
 }

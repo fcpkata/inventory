@@ -1,51 +1,39 @@
 package com.inventory.service;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import com.inventory.exception.ValidationError;
-import com.inventory.model.ProductRequest;
-import com.inventory.model.ProductResponse;
-import com.inventory.model.Role;
-import com.inventory.repository.SellerIdRepository;
+import com.inventory.model.ProductInformation;
+import com.inventory.repository.ItemRepository;
 
 @Service
 public class AddItemService {
-	
+
 	private CatalogService catalogService;
-	private SellerIdRepository sellerIdRepository;
+	private SellerIdValidationService sellerIdValidationService;
+	private ItemRepository itemRepository;
 	
-	public AddItemService(CatalogService catalogService, SellerIdRepository sellerIdRepository) {
+	
+
+	public AddItemService(CatalogService catalogService, SellerIdValidationService sellerIdValidationService, ItemRepository itemRepository) {
 		this.catalogService = catalogService;
-		this.sellerIdRepository = sellerIdRepository;
+		this.sellerIdValidationService = sellerIdValidationService;
+		this.itemRepository = itemRepository;
 	}
 
-	public ProductResponse addItem(ProductRequest user) {
-
-		ProductResponse response = catalogService.checkProductIsPresent(user.getItem());
-		response = validateSellerId(response, user.getSellerId());
-		response = checkSeller(response, user.getSellerId());
+	public void addItem(ProductInformation reqeust) {
+		List<String> errors = catalogService.checkProductIsPresent(reqeust.getItem());
+		errors = sellerIdValidationService.validateSellerId(errors, reqeust.getSellerId());
+		if(errors.size() > 0) {
+			StringBuilder sb = new StringBuilder();
+			errors.forEach(error -> sb.append(error).append("\n"));
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, sb.toString());
+		} else
+			itemRepository.saveItemToInventory(reqeust);
 		
-		return response ;
-	}
-	
-	private ProductResponse checkSeller(ProductResponse response, String id) {
-		boolean value = sellerIdRepository.sellerDetails.entrySet().stream()
-				.filter(sellerId -> sellerId.getKey().equals(id))
-				.anyMatch(sellerId -> sellerId.getValue().equals(Role.SELLER));
-		if(!value)
-			response.getValidationError().add(new ValidationError(HttpStatus.BAD_REQUEST, "user is not a registered seller"));
-		return response;
 	}
 
-	private ProductResponse validateSellerId(ProductResponse response, String id) {
-
-		boolean value =  sellerIdRepository.sellerDetails.entrySet().stream()
-				.anyMatch(sellerId -> sellerId.getKey().equals(id));
-		if(!value)
-			response.getValidationError().add(new ValidationError(HttpStatus.BAD_REQUEST, "invalid seller id"));
-		return response;
-	}
-
-	
 }
