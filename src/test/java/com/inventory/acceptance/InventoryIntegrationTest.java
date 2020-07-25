@@ -33,6 +33,7 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.inventory.model.ProductInformation;
 
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -66,6 +67,17 @@ public class InventoryIntegrationTest {
 				.andExpect(jsonPath("$.productInformations.[0].item.productId").value("PD001"))
 				.andExpect(jsonPath("$.productInformations.[0].item.price").value(100))
 				.andExpect(jsonPath("$.productInformations.[0].item.quantity").value(2));
+
+	}
+	
+	@Test
+	public void shouldReturnProductInformationWithReducedQuanityForItemValidProductId() throws Exception {
+
+		mockMvc.perform(get("/v1/item/PD001/A1B2C5")).andDo(print()).andExpect(status().isOk())
+		        .andExpect(jsonPath("$.productInformations.[0].sellerId").value("A1B2C5"))
+				.andExpect(jsonPath("$.productInformations.[0].item.productId").value("PD001"))
+				.andExpect(jsonPath("$.productInformations.[0].item.price").value(100))
+				.andExpect(jsonPath("$.productInformations.[0].item.quantity").value(1));
 
 	}
 	

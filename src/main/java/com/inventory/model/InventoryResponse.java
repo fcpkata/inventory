@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductInformations {
+public class InventoryResponse {
+
 	private List<ProductInformation> productInformations;
+	
 }

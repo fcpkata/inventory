@@ -26,9 +26,10 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import com.inventory.exception.InventoryNotFoundException;
+import com.inventory.model.InventoryResponse;
 import com.inventory.model.Item;
 import com.inventory.model.ProductInformation;
-import com.inventory.model.ProductInformations;
 import com.inventory.repository.ItemRepository;
 import com.inventory.service.AddItemService;
 import com.inventory.service.CatalogService;
@@ -62,53 +63,77 @@ public class InventoryControllerTest {
 		inventoryController = new InventoryController(mockItemRepository, mockAddItemService);
 	}
 
-	
 	@Test
 	public void shouldReturnSingleItem() {
-		
-		List<ProductInformation> items = new ArrayList<ProductInformation>();
-		items.add(getSingleItem());
-		
-		when(mockItemRepository.fetchItemById("507f191e810c19729de860ea")).thenReturn(items);
-		ResponseEntity<ProductInformations> response = inventoryController.addInventory("507f191e810c19729de860ea");
+
+		List<ProductInformation> products = new ArrayList<ProductInformation>();
+		products.add(getSingleItem());
+		InventoryResponse result = InventoryResponse.builder().productInformations(products).build();
+
+		when(mockItemRepository.fetchItemById("507f191e810c19729de860ea")).thenReturn(products);
+		ResponseEntity<InventoryResponse> response = inventoryController.getItems("507f191e810c19729de860ea");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getBody().getProductInformations()).isEqualTo(items);
+		assertThat(response.getBody()).isEqualTo(result);
+	}
+
+	@Test
+	public void shouldReturnSingleItemWithQuantityCheck() {
+
+		List<ProductInformation> products = new ArrayList<ProductInformation>();
+		products.add(getSingleItem());
+		products.get(0).getItem().reduceQuantityByOne();
+		InventoryResponse result = InventoryResponse.builder().productInformations(products).build();
+
+		when(mockItemRepository.fetchItemByItemAndSellerId("507f191e810c19729de860ea", "A1B2C5")).thenReturn(products);
+		ResponseEntity<InventoryResponse> response = inventoryController.getItemsBySellerId("507f191e810c19729de860ea",
+				"A1B2C5");
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isEqualTo(result);
+		assertThat(response.getBody().getProductInformations().get(0).getItem().getQuantity())
+				.isEqualTo(products.get(0).getItem().getQuantity());
+	}
+
+	@Test(expected = InventoryNotFoundException.class)
+	public void shouldThrowExceptionWhenQuantityNotExistsForSeller() {
+
+		when(mockItemRepository.fetchItemByItemAndSellerId("507f191e810c19729de860ea", "NewSellerId"))
+				.thenThrow(new InventoryNotFoundException("Seler don't have enough quantity of items"));
+		inventoryController.getItemsBySellerId("507f191e810c19729de860ea", "NewSellerId");
+
 	}
 
 	@Test
 	public void shouldReturnMultipleItems() {
-		List<ProductInformation> items = new ArrayList<ProductInformation>();
-		items.add(getSingleItem());
-		items.addAll(getMultipleItems());
-		when(mockItemRepository.fetchItemById("507f191e810c19729de860eb")).thenReturn(items);
+		List<ProductInformation> products = new ArrayList<ProductInformation>();
+		products.add(getSingleItem());
+		products.addAll(getMultipleItems());
+		InventoryResponse result = InventoryResponse.builder().productInformations(products).build();
+		when(mockItemRepository.fetchItemById("507f191e810c19729de860eb")).thenReturn(products);
 
-		ResponseEntity<ProductInformations> response = inventoryController.addInventory("507f191e810c19729de860eb");
+		ResponseEntity<InventoryResponse> response = inventoryController.getItems("507f191e810c19729de860eb");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getBody().getProductInformations()).isEqualTo(items);
+		assertThat(response.getBody()).isEqualTo(result);
 	}
 
 	private ProductInformation getSingleItem() {
-		ProductInformation item =ProductInformation.builder().sellerId("ABC1")
-				.item(Item.builder().productId("507f191e810c19729de860ea").price(100).quantity(2).build())
-				.build();
+		ProductInformation item = ProductInformation.builder().sellerId("ABC1")
+				.item(Item.builder().productId("507f191e810c19729de860ea").price(100).quantity(2).build()).build();
 		return item;
 	}
 
 	private List<ProductInformation> getMultipleItems() {
 		ProductInformation itemOne = ProductInformation.builder().sellerId("ABC1")
-				.item(Item.builder().productId("507f191e810c19729de860eb").price(900).quantity(2).build())
-				.build();
+				.item(Item.builder().productId("507f191e810c19729de860eb").price(900).quantity(2).build()).build();
 		ProductInformation itemTwo = ProductInformation.builder().sellerId("XYZ")
-				.item(Item.builder().productId("507f191e810c19729de860eb").price(850).quantity(2).build())
-				.build();
+				.item(Item.builder().productId("507f191e810c19729de860eb").price(850).quantity(2).build()).build();
 		List<ProductInformation> items = new ArrayList<ProductInformation>();
 		items.add(itemOne);
 		items.add(itemTwo);
 		return items;
 	}
-	 
 
 	@Test
 	public void shouldReturn200_whenProductIDIsPresent() throws FileNotFoundException, IOException {
@@ -121,8 +146,9 @@ public class InventoryControllerTest {
 	public void shouldReturn400_whenProductIDIsNotPresent() throws FileNotFoundException, IOException {
 		expectedException.expect(HttpClientErrorException.class);
 		expectedException.expectMessage("invalid product id\nuser is not a registered seller\n");
-		doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "invalid product id\nuser is not a registered seller\n")).when(mockAddItemService).addItem(any());
+		doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+				"invalid product id\nuser is not a registered seller\n")).when(mockAddItemService).addItem(any());
 		inventoryController.addItem(request);
 	}
-	
+
 }
