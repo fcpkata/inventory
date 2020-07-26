@@ -70,7 +70,7 @@ public class InventoryControllerTest {
 		items.add(getSingleItem());
 		
 		when(mockItemRepository.fetchItemById("507f191e810c19729de860ea")).thenReturn(items);
-		ResponseEntity<ProductInformations> response = inventoryController.addInventory("507f191e810c19729de860ea");
+		ResponseEntity<ProductInformations> response = inventoryController.getItem("507f191e810c19729de860ea");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(response.getBody().getProductInformations()).isEqualTo(items);
@@ -83,7 +83,7 @@ public class InventoryControllerTest {
 		items.addAll(getMultipleItems());
 		when(mockItemRepository.fetchItemById("507f191e810c19729de860eb")).thenReturn(items);
 
-		ResponseEntity<ProductInformations> response = inventoryController.addInventory("507f191e810c19729de860eb");
+		ResponseEntity<ProductInformations> response = inventoryController.getItem("507f191e810c19729de860eb");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(response.getBody().getProductInformations()).isEqualTo(items);
@@ -113,7 +113,7 @@ public class InventoryControllerTest {
 	@Test
 	public void shouldReturn200_whenProductIDIsPresent() throws FileNotFoundException, IOException {
 
-		ResponseEntity<String> response = inventoryController.addItem(request);
+		ResponseEntity<String> response = inventoryController.addInventory(request);
 		assertThat(response.getStatusCodeValue()).isEqualTo(200);
 	}
 
@@ -122,7 +122,7 @@ public class InventoryControllerTest {
 		expectedException.expect(HttpClientErrorException.class);
 		expectedException.expectMessage("invalid product id\nuser is not a registered seller\n");
 		doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "invalid product id\nuser is not a registered seller\n")).when(mockAddItemService).addItem(any());
-		inventoryController.addItem(request);
+		inventoryController.addInventory(request);
 	}
 	
 }
