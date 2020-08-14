@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.inventory.model.InventoryResponse;
 import com.inventory.model.ProductInformation;
-import com.inventory.model.ProductInformations;
 import com.inventory.repository.ItemRepository;
 import com.inventory.service.AddItemService;
 
@@ -27,24 +27,31 @@ public class InventoryController {
 
 	private ItemRepository itemRepository;
 	private AddItemService addItemService;
-	
 
 	@Autowired
 	public InventoryController(ItemRepository itemRepository, AddItemService addItemService) {
 		this.itemRepository = itemRepository;
 		this.addItemService = addItemService;
-		
 	}
 
-	@GetMapping("/item/{itemId}")
-	public ResponseEntity<ProductInformations> addInventory(@PathVariable(value = "itemId") String itemId) {
-		List<ProductInformation> productInfoList = itemRepository.fetchItemById(itemId);
-		ProductInformations response = ProductInformations.builder().productInformations(productInfoList).build();
-		return new ResponseEntity<ProductInformations>(response, HttpStatus.OK);
+	@GetMapping(path = "/item/{itemId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<InventoryResponse> getItems(@PathVariable(value = "itemId") String itemId) {
+		List<ProductInformation> productInformations = itemRepository.fetchItemById(itemId);
+		InventoryResponse result = InventoryResponse.builder().productInformations(productInformations).build();
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+
+	@GetMapping(path = "/item/{itemId}/{sellerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<InventoryResponse> getItemsBySellerId(@PathVariable(value = "itemId") String itemId,
+			@PathVariable(value = "sellerId") String sellerId) {
+		List<ProductInformation> productInformations = itemRepository.fetchItemByItemAndSellerId(itemId, sellerId);
+		productInformations.get(0).getItem().reduceQuantityByOne();
+		InventoryResponse result = InventoryResponse.builder().productInformations(productInformations).build();
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
 	@PostMapping("/inventory")
-	public ResponseEntity<String> addItem(@Valid @NotNull @RequestBody ProductInformation request) {	
+	public ResponseEntity<String> addItem(@Valid @NotNull @RequestBody ProductInformation request) {
 
 		addItemService.addItem(request);
 		return new ResponseEntity<String>(HttpStatus.OK);

@@ -24,4 +24,9 @@ public class Item {
 	private String productId;
 	private double price;
 	private int quantity;
+	
+	public void reduceQuantityByOne() {
+		if(quantity > 0)
+		quantity = quantity - 1;
+	}
 }

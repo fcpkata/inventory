@@ -11,14 +11,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.api.Order;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -31,7 +36,10 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import com.inventory.model.Item;
 import com.inventory.model.ProductInformation;
+import com.inventory.repository.ItemRepository;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -52,6 +60,9 @@ public class InventoryIntegrationTest {
 
 	private Object request;
 	
+	@Autowired
+	ItemRepository itemRepo;
+	
 	@Before
 	public void setup() throws FileNotFoundException, IOException {
 		
@@ -70,6 +81,18 @@ public class InventoryIntegrationTest {
 	}
 	
 	@Test
+	public void shouldReturnProductInformationWithReducedQuanityForItemValidProductId() throws Exception {
+
+		
+		mockMvc.perform(get("/v1/item/PD002/A1B2C6")).andDo(print()).andExpect(status().isOk())
+		        .andExpect(jsonPath("$.productInformations.[0].sellerId").value("A1B2C6"))
+				.andExpect(jsonPath("$.productInformations.[0].item.productId").value("PD002"))
+				.andExpect(jsonPath("$.productInformations.[0].item.price").value(150))
+				.andExpect(jsonPath("$.productInformations.[0].item.quantity").value(4));
+
+	}
+	
+	@Test
 	public void shouldReturnProductInformationForItemWithMultipleSellers() throws Exception {
 		
 		mockMvc.perform(get("/v1/item/PD002")).andDo(print()).andExpect(status().isOk())
@@ -80,7 +103,7 @@ public class InventoryIntegrationTest {
 				.andExpect(jsonPath("$.productInformations.[1].sellerId").value("A1B2C6"))
 				.andExpect(jsonPath("$.productInformations.[1].item.productId").value("PD002"))
 				.andExpect(jsonPath("$.productInformations.[1].item.price").value(150))
-				.andExpect(jsonPath("$.productInformations.[1].item.quantity").value(5));
+				.andExpect(jsonPath("$.productInformations.[1].item.quantity").value(4));
 	}
 	@Test
 	@Ignore
